@@ -1,96 +1,70 @@
-#include <iostream>
+#include <vector>
+#include <memory>
 using namespace std;
 
-class TrieNode
-{
+#ifndef TRIE_HPP
+#define TRIE_HPP
+
+class Node {
 public:
-    char data;
-    TrieNode *child[26];
-    int wordEnd;
-    TrieNode()
-    {
-        wordEnd = 0;
-        for (int i = 0; i < 26; i++)
-            child[i] = NULL;
-    }
+  vector<shared_ptr<Node>> child;
+  int end;
+  Node() {
+    child.assign(26, NULL);
+    end = 0;
+  }
 };
-
-class Trie
-{
-private:
-    TrieNode *root;
-
-    void insert(TrieNode *root, string s, int idx)
-    {
-        if (idx == s.size())
-        {
-            root->wordEnd++;
-            return;
-        }
-        TrieNode *newNode;
-        if (root->child[s[idx] - 'a'] == NULL)
-        {
-            newNode = new TrieNode();
-            newNode->data = s[idx];
-            root->child[s[idx] - 'a'] = newNode;
-        }
-        else
-        {
-            newNode = root->child[s[idx] - 'a'];
-        }
-        insert(newNode, s, idx + 1);
-    }
-    bool isPresent(TrieNode *root, string s, int idx)
-    {
-        if (s.size() == idx)
-            return root->wordEnd > 0;
-
-        if (root->child[s[idx] - 'a'] != NULL)
-            return isPresent(root->child[s[idx] - 'a'], s, idx + 1);
-        return false;
-    }
-    bool isPrefix(TrieNode *root, string s, int idx)
-    {
-        if (s.size() == idx)
-            return true;
-        if (root->child[s[idx] - 'a'] != NULL)
-            return isPrefix(root->child[s[idx] - 'a'], s, idx + 1);
-        return false;
-    }
-    void remove(TrieNode *root, string s, int idx)
-    {
-        if (s.size() == idx)
-        {
-            root->wordEnd--;
-            return;
-        }
-        remove(root->child[s[idx] - 'a'], s, idx + 1);
-    }
-
+class Trie {
 public:
-    Trie()
-    {
-        root = new TrieNode();
-        root->data = '$';
+  shared_ptr<Node> root;
+  Trie() {
+    root = make_shared<Node>();
+  }
+  void insert(string &s) {
+    shared_ptr<Node>node = root;
+    for(int i = 0; i < (int)s.size(); i++) {
+      if(node->child[s[i]-'a'] == NULL) {
+        node->child[s[i]-'a'] = make_shared<Node>();
+      }
+      node = node->child[s[i]-'a'];
+    }
+    node->end++;
+  }
+  bool search(string &s) {
+    shared_ptr<Node>node = root;
+    for(int i = 0; i < (int)s.size(); i++) {
+      if(node->child[s[i]-'a'] == NULL) return false;
+      node = node->child[s[i]-'a'];
+    }
+    return node->end;
+  }
+
+  bool isEmpty(shared_ptr<Node> node) {
+    return node->child.empty() and node->end == 0;
+  }
+  bool erase(string &s, int idx, shared_ptr<Node> node) {
+    if(idx == (int)s.size()) {
+      node->end--;
+      if(isEmpty(node)) {
+        node.reset();
+        return true;
+      }
+      return false;
     }
 
-    void insert(string &s)
-    {
-        insert(root, s, 0);
-    }
-
-    bool isPrefix(string &s)
-    {
-        return isPrefix(root, s, 0);
-    }
-
-    bool isPresent(string &s)
-    {
-        return isPresent(root, s, 0);
-    }
-
-    void remove(string &s)
-    {
-        remove(root, s, 0);
-    }
+    bool remove = erase(s, idx+1, node->child[s[idx]-'a']);
+    if(remove) {
+      if(isEmpty(node)) {
+        node.reset();
+        return true;
+      }
+      return false;
+    } 
+    return false;
+  }
+  void erase(string &s) {
+    if(!search(s)) return;
+    erase(s, 0, root);
+  }
 };
+#endif
