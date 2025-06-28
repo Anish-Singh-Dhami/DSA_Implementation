@@ -1,0 +1,28 @@
+<snippet>
+	<content><![CDATA[
+// TODO : return type
+void zfunction(string &s) {
+  int n = s.size();
+  vector<int> z(n);
+  int l = 0, r = 0;
+  for(int i = 1; i < n; i++) {
+    if(i <= r) {
+      z[i] = min(r-i+1, z[i-l]);
+    }
+    while((i+z[i] < n) and s[z[i]] == s[i+z[i]]) {
+      z[i]++;
+    }
+    if(z[i]+i-1 > r) {
+      r = z[i]+i-1;
+      l = i;
+    }
+  }
+  cout << z << '\n';
+}
+
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>zFunction</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

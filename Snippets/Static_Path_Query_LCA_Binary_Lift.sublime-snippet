@@ -1,0 +1,79 @@
+<snippet>
+	<content><![CDATA[
+		const int N = 200010;
+const int M = 20;
+int n,q;
+int jmp[N][M];
+int val[N][M];
+int depth[N];
+vector<int> adj[N];
+
+
+void dfs(int u, int p, int lvl) {
+  jmp[u][0] = p;
+  val[u][0] = 1;
+  depth[u] = lvl;
+  for(auto &v : adj[u]) {
+    if(v == p) continue;
+    dfs(v, u, lvl+1);
+  }
+}
+
+int mergeOperation(int lhs, int rhs) {
+  return lhs+rhs;
+}
+
+void binaryLift() {
+  for(int lvl = 1; lvl < M; lvl++) {
+    for(int u = 1; u <= n; u++) {
+      jmp[u][lvl] = jmp[jmp[u][lvl-1]][lvl-1];
+      val[u][lvl] = mergeOperation(val[u][lvl-1], val[jmp[u][lvl-1]][lvl-1]);
+    }
+  }
+}
+
+int findKthParent(int u, int k) {
+  int node = u;
+  for(int bit = M-1; bit >= 0; bit--) {
+    if(k & (1<<bit)) {
+      node = jmp[node][bit];
+    }
+  }
+  return node == 0 ? -1 : node;
+}
+
+int lca(int u, int v) {
+  if(depth[u] > depth[v]) swap(u, v);
+  int k = depth[v]-depth[u];
+  v = findKthParent(v, k);
+  if(v == u) return u;
+  for(int bit = M-1; bit >= 0; bit--) {
+    if(jmp[u][bit] != jmp[v][bit]) {
+      u = jmp[u][bit];
+      v = jmp[v][bit];
+    }
+  }
+  return jmp[u][0];
+}
+
+int findKthValue(int u, int k) {
+  int res = 0;
+  for(int bit = M-1; bit >= 0; bit--) {
+    if(k & (1<<bit)) {
+      res = mergeOperation(res, val[u][bit]);
+      u = jmp[u][bit];
+    }
+  }
+  return res;
+}
+
+int pathQuery(int u, int v) {
+  int LCA = lca(u, v);
+  return findKthValue(u, depth[u]-depth[LCA]) + findKthValue(v, depth[v]-depth[LCA]);
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>StaticPathQuery_LCA_Binary_Lift</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

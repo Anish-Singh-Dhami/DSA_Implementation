@@ -1,0 +1,80 @@
+<snippet>
+	<content><![CDATA[
+/*
+  Range Update Point Query SegTree : 
+  range update operation need to be associative a*(b*c) = (a*b)*c (merge to same value based on any order)
+  and commutative a*b = b*a (order doesn't matter), if not commutative need to use lazy segtree
+*/
+class SegTree {
+public:
+  int size;
+  int NEUTRAL_ELEMENT;
+  vector<int> operation;
+
+  SegTree(int n) {
+    // Default value of each node
+    NEUTRAL_ELEMENT = 0;
+    size = 1;
+    while (size < n) size *= 2;
+    operation.assign(2 * size, NEUTRAL_ELEMENT);
+  }
+
+  // Calculate the answer of current node based on its child nodes
+  int merge(int a, int b) {
+    return a+b;
+  }
+
+  void build(vector<int> &a) { build(a, 0, 0, size); }
+
+  void build(vector<int> &a, int x, int lx, int rx) {
+    if (rx - lx == 1) {
+      if (lx < (int)a.size()) {
+          operation[x] = a[lx];
+      }
+      return;
+    }
+    int mid = (lx + rx) / 2;
+    build(a, 2 * x + 1, lx, mid);
+    build(a, 2 * x + 2, mid, rx);
+    operation[x] = merge(operation[x * 2 + 1],operation[x * 2 + 2]);
+  }
+
+  // B/W : [l, r) : operation need to be Associative and Comutative(order of operation doesn't matter)
+  void rangeUpdate(int l, int r, int v, int x, int lx, int rx) {
+    if(l >= rx || lx >= r) return;
+    if(lx >= l and rx <= r) { /*Overlapping Segment, apply the range update operation*/
+        operation[x] += v;
+        return;
+    }
+
+    int mid = (lx + rx) / 2;
+    rangeUpdate(l, r, v, 2*x+1, lx, mid);
+    rangeUpdate(l, r, v, 2*x+2, mid, rx);
+  }
+
+  void rangeUpdate(int l, int r, int v) { rangeUpdate(l, r, v, 0, 0, size); }
+
+  int pointQuery(int i, int x, int lx, int rx) {
+    if(rx - lx == 1) { /*leaf node*/
+      return operation[x];
+    }
+    int mid = (lx + rx) / 2;
+    int res;
+    if(i < mid) {
+      res = pointQuery(i, 2*x+1, lx, mid);
+    } else { 
+      res = pointQuery(i, 2*x+2, mid, rx);
+    }
+    return res = merge(res, operation[x]);
+  }
+
+  int pointQuery(int i) { return pointQuery(i, 0, 0, size); }
+};
+
+
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>RangeUpdatePointQuerySegTree</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

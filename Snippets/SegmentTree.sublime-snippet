@@ -1,0 +1,123 @@
+<snippet>
+	<content><![CDATA[
+template <class T, class U>
+class SegTree
+{
+public:
+  int n, treeSize;
+  vector<T> tree;
+  vector<U> lazy;
+  T IDENTITY_ELEMENT;
+  U IDENTITY_UPDATE;
+
+  function<T(T &, T &)> mergeNodes;
+  function<void(U &, U &)> combineUpdates;
+  function<void(T &, U &)> applyUpdate;
+  bool useLazy;
+
+  void build(vector<T> &arr, int x, int lx, int rx) {
+    if(rx-lx == 1) {
+      if(lx < (int)arr.size()) { 
+        tree[x] = arr[lx]; 
+      }
+      return;
+    } 
+    int m = (lx+rx) >> 1;
+    build(arr, (x<<1)+1, lx, m);
+    build(arr, (x<<1)+2, m, rx);
+    tree[x] = mergeNodes(tree[(x<<1)+1], tree[(x<<1)+2]);
+  }
+  
+  void propagateDown(int x, int lx, int rx) {
+    if(lazy[x] == IDENTITY_UPDATE) return;
+    if(rx-lx == 1) return;
+    combineUpdates(lazy[(x<<1)+1], lazy[x]);
+    combineUpdates(lazy[(x<<1)+2], lazy[x]);
+    applyUpdate(tree[(x<<1)+1], lazy[x]);
+    applyUpdate(tree[(x<<1)+2], lazy[x]);
+    lazy[x] = IDENTITY_UPDATE;
+  }
+
+  void rangeUpdate(int l, int r, U &upd, int x, int lx, int rx) {
+    if(useLazy) propagateDown(x, lx, rx);
+    if(l >= rx || lx >= r) return;
+    if(l <= lx && r >= rx) {
+      combineUpdates(lazy[x], upd);
+      applyUpdate(tree[x], upd);
+      return;
+    }
+    int m = (lx+rx) >> 1;
+    rangeUpdate(l, r, upd, (x<<1)+1, lx, m);
+    rangeUpdate(l, r, upd, (x<<1)+2, m, rx);
+    tree[x] = mergeNodes(tree[(x<<1)+1], tree[(x<<1)+2]);
+  }
+
+  void pointUpdate(int i, T &v, int x, int lx, int rx) {
+    if(rx-lx == 1) {
+      applyUpdate(tree[x], v);
+      return;
+    }
+    int m = (lx+rx) >> 1;
+    if(i < m) {
+      pointUpdate(i, v, (x<<1)+1, lx, m);
+    } else {
+      pointUpdate(i, v, (x<<1)+2, m, rx);
+    }
+    tree[x] = mergeNodes(tree[(x<<1)+1], tree[(x<<1)+2]);
+  }
+
+  T rangeQuery(int l, int r, int x, int lx, int rx) {
+    if(useLazy) propagateDown(x, lx, rx);
+    if(l >= rx || lx >= r) return IDENTITY_ELEMENT;
+    if(l <= lx and r >= rx) {
+      return tree[x];
+    }
+    int m = (lx+rx)>>1;
+    T lChild = rangeQuery(l, r, (x<<1)+1, lx, m);
+    T rChild = rangeQuery(l, r, (x<<1)+2, m, rx);
+    return mergeNodes(lChild, rChild);
+  }
+public:
+  SegTree(int size, T identityElement, U identityUpdate, 
+          function<T(T &, T &)> mergeFn, 
+          function<void(U &, U &)> combineFn,
+          function<void(T &, U &)> applyFn,
+          bool enableLazy = false)
+      : n(size),
+        IDENTITY_ELEMENT(identityElement),
+        IDENTITY_UPDATE(identityUpdate),
+        mergeNodes(mergeFn),
+        combineUpdates(combineFn),
+        applyUpdate(applyFn),
+        useLazy(enableLazy) {
+    int h = 32 - __builtin_clzll(n);
+    n = (1<<h);
+    treeSize = (n << 1) - 1; // 2^(h+1) - 1
+    tree.resize(treeSize, IDENTITY_ELEMENT);
+    if (useLazy) {
+      lazy.resize(treeSize, IDENTITY_UPDATE);
+    } 
+  }
+
+  void build(vector<T>& arr) {
+    build(arr, 0, 0, n);
+  }
+
+  void rangeUpdate(int l, int r, U upd) {
+      rangeUpdate(l, r, upd, 0, 0, n);
+  }
+
+  void pointUpdate(int i, U upd) {
+    pointUpdate(i, upd, 0, 0, n);
+  }
+
+  T rangeQuery(int l, int r) {
+      return rangeQuery(l, r, 0, 0, n);
+  }
+};  
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>SegTree</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

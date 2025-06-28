@@ -1,0 +1,31 @@
+<snippet>
+	<content><![CDATA[
+void dfs(int u, int p) {
+  dp[u] = 0;
+  for(auto &it : adj[u]) {
+    int v = it[0];
+    if(lvl[v] == 0) { /*unvisited nodes forward edge*/
+      lvl[v] = lvl[u]+1;
+      dfs(v, u);
+      dp[u] += dp[v];
+    } else if(lvl[v] < lvl[u]) { /*back edge pointing up, including parent edge*/
+      dp[u]++;
+    } else if(lvl[v] > lvl[u]) { /*back edge pointing down*/
+      dp[u]--;
+    }
+    // cout << p << "->" << u << "->" << v << " " << dp[u] << '\n';
+  }
+  // parent edge isn't a back edge
+  dp[u]--;
+  // cout << u << " " << p << " " << dp[u] << '\n';
+  if(p != -1 and dp[u] == 0) {
+    bridges.insert({u, p});
+  }
+}
+
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>bridgeFinding</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

@@ -1,0 +1,30 @@
+<snippet>
+	<content><![CDATA[
+template <class T>
+class SparseTable {
+public:
+  vector<vector<T>> jmp;
+  T merge(T lhs, T rhs) {
+    return min(lhs, rhs);
+  }
+  SparseTable(vector<T> &a) : jmp(1, a) {
+    int n = a.size();
+    for(int pw = 1, i = 1; pw*2 <= n; pw *= 2, i++) {
+      jmp.emplace_back(n - 2*pw + 1);
+      for(int j = 0; j < (int)jmp[i].size(); j++) {
+        jmp[i][j] = merge(jmp[i-1][j], jmp[i-1][j+pw]);
+      }
+    }
+  }
+  T query(int l, int r) {
+    r++;
+    int len = 31 - __builtin_clz(r-l);
+    return merge(jmp[len][l], jmp[len][r-(1<<len)]);
+  }
+};
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>genericRMQ</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>
