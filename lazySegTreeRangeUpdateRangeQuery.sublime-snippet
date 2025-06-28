@@ -1,0 +1,83 @@
+<snippet>
+	<content><![CDATA[
+class LazySegTree {
+public:
+  vector<int> operation;
+  vector<int> values;
+  int NO_OPERATION;
+  int NEUTRAL_ELEMENT;
+  int size;
+  LazySegTree(int n) {
+    size = 1;
+    NEUTRAL_ELEMENT = 1e17;
+    NO_OPERATION = 1e18;
+    while(size <= n) size *= 2;
+    // initial values of operation and values
+    operation.resize(2*size, 0); 
+    values.resize(2*size, 0);
+  }
+ 
+  int calculate(int a, int b) {
+    return min(a, b);
+  }
+ 
+  int applyOperation(int child, int parent) {
+    if(parent == NO_OPERATION) { /*Do Nothing*/
+      return child;
+    }
+    /*apply the non commutative operation: return child @ parent (@ = abstract operation)*/
+    return child = parent;
+  }
+ 
+  void propagateDown(int x, int lx, int rx) {
+    if(rx - lx == 1) {/*leaf node can't propagate further*/
+      return;
+    }
+    operation[2*x+1] = applyOperation(operation[2*x+1], operation[x]);
+    operation[2*x+2] = applyOperation(operation[2*x+2], operation[x]);
+    values[2*x+1] = applyOperation(values[2*x+1], operation[x]);
+    values[2*x+2] = applyOperation(values[2*x+2], operation[x]);
+    operation[x] = NO_OPERATION;
+  }
+ 
+  void rangeUpdate(int l, int r, int v, int x, int lx, int rx) {
+    propagateDown(x, lx, rx); /*propagate the previous operation downward => no previous operation left above*/
+    if(lx >= r || rx <= l) { 
+      return;
+    }
+    if(l <= lx and r >= rx) {
+      operation[x] = applyOperation(operation[x], v);
+      values[x] = applyOperation(values[x], v);
+      return;
+    }
+    int mid = (lx+rx) / 2;
+    rangeUpdate(l, r, v, 2*x+1, lx, mid);
+    rangeUpdate(l, r, v, 2*x+2, mid, rx);
+    values[x] = calculate(values[2*x+1], values[2*x+2]);
+  }
+ 
+  void rangeUpdate(int l, int r, int v) { rangeUpdate(l, r, v, 0, 0, size); }
+ 
+  int rangeQuery(int l, int r, int x, int lx, int rx) {
+    propagateDown(x, lx, rx);
+    if(l >= rx || r <= lx) {
+      return NEUTRAL_ELEMENT;
+    }
+    if(lx >= l and rx <= r) {
+      return values[x];
+    }
+    int mid = (lx + rx) / 2;
+    int left = rangeQuery(l, r, 2*x+1, lx, mid);
+    int right = rangeQuery(l, r, 2*x+2, mid, rx);
+    return min(left, right);
+  }
+ 
+  int rangeQuery(int l, int r) { return rangeQuery(l, r, 0, 0, size); }
+};
+ 
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>lazyRangeUpdateRangeQuery</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

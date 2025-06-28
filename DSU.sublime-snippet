@@ -1,0 +1,39 @@
+<snippet>
+	<content><![CDATA[
+class DSU {
+  public:
+  vector<int> parent;
+  vector<int> rank;
+  DSU(int V) {
+    parent.resize(V);
+    rank.resize(V);
+    for(int i = 0; i < V; i++) {
+      parent[i] = i;
+      rank[i] = 0;
+    }
+  }
+  int find(int a) {
+    if(a == parent[a]) return a;
+    return parent[a] = find(parent[a]);
+  }
+  void merge(int a, int b) {
+    a = find(a);
+    b = find(b);
+    if(rank[a] == rank[b]){
+      rank[a]++;
+    }
+    if(rank[a] > rank[b]) {
+      parent[b] = a;  // parent[b] -> a;
+    }
+    else {
+      parent[a] = b; // parent[a] -> b
+    }
+  }
+};
+
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>DSU</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

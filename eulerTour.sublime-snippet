@@ -1,0 +1,32 @@
+<snippet>
+	<content><![CDATA[
+class EulerTour {
+    public:
+    int t;
+    vector<int> in, out, tour;
+    EulerTour(int n) {
+        t = -1;
+        in.assign(n, -1);
+        out.assign(n, -1);
+        tour.assign(n, -1);
+    }
+    void dfs(int src, vector<int> adj[], vector<int> &value) {
+        in[src] = ++t;
+        tour[t] = value[src];
+        for(auto &it : adj[src]) {
+            if(in[it] == -1) dfs(it, adj, value);
+        }
+        out[src] = t;
+        // Double Occurence : Path Query
+        // out[src] = ++t;
+        // tour[t] = value[src];
+    }
+};
+
+
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>eulertour</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

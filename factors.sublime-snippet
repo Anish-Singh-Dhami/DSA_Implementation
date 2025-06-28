@@ -1,0 +1,20 @@
+<snippet>
+	<content><![CDATA[
+// O(N log N) time approax:
+const int N = 1e5; 
+vector<int> factors[N + 1];
+
+void factor() {
+  for(int i = 1; i <= N; i++) {
+    for(int j = i; j <= N; j+=i) {
+      factors[j].push_back(i);
+    }
+  }
+} 
+
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>Factors</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

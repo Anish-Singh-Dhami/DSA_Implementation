@@ -1,0 +1,48 @@
+<snippet>
+	<content><![CDATA[
+vector<vector<int>> adj;
+vector<bool> isRemoved;
+
+int dfs_size(int u, int p) {
+  if(isRemoved[u]) return 0;
+  int s = 1;
+  for(auto &v : adj[u]) {
+    if(v != p) s += dfs_size(v, u);
+  }
+  return s;
+}
+
+int dfs_centroid(int u, int p, int n, int &centroid) {
+  if(isRemoved[u]) return 0;
+  int s = 1;
+  bool isCentroid = true;
+  for(auto&v: adj[u]) {
+    if(v != p) {
+      int sv = dfs_centroid(v, u, n, centroid);
+      if(2*sv > n) isCentroid = false;
+      s += sv; 
+    }
+  }
+  if(2*s < n) isCentroid = false;
+  if(isCentroid) centroid = u;
+  return s;
+}
+
+void build_centroid_decomposition(int u) {
+  int n = dfs_size(u, -1);
+  int centroid = -1;
+  dfs_centroid(u, -1, n, centroid);
+  isRemoved[centroid] = 1;
+  // do something
+  for(auto &v : adj[centroid]) {
+    if(isRemoved[v]) continue;
+    build_centroid_decomposition(v);
+  }
+}
+
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>centroid_decomposition</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

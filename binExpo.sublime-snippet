@@ -1,0 +1,20 @@
+<snippet>
+	<content><![CDATA[
+int power(int base, int power${1:, int p}) {
+  int res = 1ll;
+  while(power) {
+    if(power%2) {
+    	res = (res*base)${2:%p};
+    } 
+    base = (base*base)${2:%p};
+    power /= 2;
+
+  }
+  return res;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>power</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

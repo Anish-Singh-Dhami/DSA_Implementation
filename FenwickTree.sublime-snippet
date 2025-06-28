@@ -1,0 +1,43 @@
+<snippet>
+	<content><![CDATA[
+class BIT {
+public:
+  vector<long long> bit;
+  int size; 
+  BIT(int n) {
+    bit = vector<long long>(n+1, 0); // 1 based indexing.
+    size = n+1;
+  }
+  void build(vector<long long> &a) {
+    bit = a;
+    for(int i = 1; i < size; i++) {
+      int j = i + (i & (-i));
+      if(j < size) bit[j] += bit[i];
+    }
+  }
+  void update(int i, long long v) {
+    while(i < size) {
+      bit[i] += 1ll*v;
+      i += (i & (-i));
+    }
+  }
+  long long sum(int i) {
+    long long res = 0LL;
+    while(i > 0) {
+      res += bit[i];
+      i -= (i & (-i));
+    }
+    return res;
+  }
+  long long query(int i, int j) {
+    return sum(j) - sum(i-1);
+  }
+};
+
+
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>FenwickTree</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

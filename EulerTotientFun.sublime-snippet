@@ -1,0 +1,25 @@
+<snippet>
+	<content><![CDATA[
+		// T(n) = (sqrt(n))
+int ETF(int n) {
+  int cnt = n;
+  for(int i = 2; i * i <= n; i++) {
+    if(n % i == 0) {
+      while(n % i == 0) n /= i;
+      cnt *= (i - 1);
+      cnt /= i;
+    }
+  }
+  if(n > 1) {
+    cnt *= (n - 1);
+    cnt /= n;
+  }
+  return cnt;
+}
+
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>ETF</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

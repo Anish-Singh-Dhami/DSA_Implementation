@@ -1,0 +1,155 @@
+<snippet>
+	<content><![CDATA[
+void merge(vi &arr, int l, int mid, int r) {
+	int lStart = l, rStart = mid+1;
+	vector<int> temp;
+	while(lStart <= mid && rStart <= r) {
+		if(arr[lStart] < arr[rStart]) {
+			temp.pb(arr[lStart++]);
+		} else {
+			temp.pb(arr[rStart++]);
+		}
+	}
+	while(lStart <= mid) temp.pb(arr[lStart++]);
+	while(rStart <= r) temp.pb(arr[rStart++]);
+
+	for(auto &it : temp) {
+		arr[l++] = it;
+	}
+}
+
+void mergeSort(vi &arr, int start, int end) {
+	if(start >= end) {
+		return;
+	}
+	int mid = (start + end) / 2;
+	mergeSort(arr, start, mid);
+	mergeSort(arr, mid+1, end);
+	merge(arr, start, mid, end); 
+}
+void printArray(vi &arr) {
+	for(auto &it : arr) cout << it << " ";
+		cout << nline;
+}
+
+int partition(vi &arr, int l, int r) {
+	// normal quick sort partition:
+	// consider last element and place it in its right position
+	int piv = rand() % (r - l + 1);
+	// int key = arr[r];
+	// int pos = l;
+	int key = arr[l + piv];
+	swap(arr[l + piv], arr[r]);
+	int pos = l;
+	for(int i = l; i <= r; i++) {
+		if(arr[i] <= key) {
+			swap(arr[i], arr[pos++]);
+		}
+	}
+	return pos-1;
+}
+
+void quickSort(vi &arr, int l, int r) {
+	if(l >= r) return;
+	int pivot = partition(arr, l, r);
+	quickSort(arr, l, pivot - 1);
+	quickSort(arr, pivot+1, r);
+}
+
+void heapify(vi &arr, int i, int n) {
+	int l = 2*i + 1;
+	int r = l + 1;
+	int largestIdx = i;
+	if(l < n && arr[largestIdx] < arr[l]) largestIdx = l;
+	if(r < n && arr[largestIdx] < arr[r]) largestIdx = r;
+	if(largestIdx != i) {
+		swap(arr[i], arr[largestIdx]);
+		heapify(arr, largestIdx, n);
+	}
+}
+void heapSort(vi &arr) {
+	int n = arr.size();
+	// build heap
+	for(int i = n/2 - 1; i >= 0; i--) {
+		heapify(arr, i, n);
+	}
+	for(int i = n-1; i > 0; i--) {
+		swap(arr[i], arr[0]);
+		heapify(arr, 0, i);
+	}
+}
+void selectionSort(vi &arr) {
+	int n = arr.size();
+	for(int i = 0; i < n-1; i++) {
+		for(int j = i+1; j < n; j++) {
+			if(arr[i] > arr[j]) {
+				swap(arr[i], arr[j]);
+			}
+		}
+	}
+}
+void insertionSort(vi &arr) {
+	int n = arr.size();
+	for(int i = 1; i < n; i++) {
+		int j = i-1;
+		int key = arr[i];
+		while(j >= 0 && arr[j] > key) {
+			arr[j+1] = arr[j];
+			j--;
+		}
+		arr[j+1] = key;
+	}
+}
+
+void bubbleSort(vi &arr) {
+	int n = arr.size();
+	for(int i = 1; i < n; i++) {
+		bool swapping = false;
+		for(int j = 0; j < n - i; j++) {
+			if(arr[j] > arr[j+1]) {
+				swap(arr[j], arr[j+1]);
+				swapping = true;
+			}
+		}
+		if(!swapping) break;
+	}
+}
+void countSort(vi &arr) {
+	int n = arr.size();
+	int mx = *max_element(all(arr));
+	vi pref(mx+1, 0);
+	
+	for(auto &it : arr) pref[it]++;
+	
+	for(int i = 1; i <= mx; i++) {
+		pref[i] = pref[i] + pref[i-1];
+	}
+	vi result(n);
+	for(int i = n-1; i >= 0; i--) {
+		result[--pref[arr[i]]] = arr[i];
+	}	
+	arr = result;
+}
+void testSortAlgo(vi &arr) {
+	srand(time(0));
+	for(int i = 0; i < 5; i++) {
+		vi temp = arr;
+		random_shuffle(all(temp));
+		printArray(temp);
+		// mergeSort(temp, 0, arr.size()-1);
+		// quickSort(temp, 0, arr.size() - 1);
+		heapSort(temp);
+		// selectionSort(temp);
+		// insertionSort(temp);
+		// bubbleSort(temp);
+		// countSort(temp);
+		printArray(temp);
+	}
+}
+
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>allSortAlgo</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

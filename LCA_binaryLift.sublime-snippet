@@ -1,0 +1,70 @@
+<snippet>
+	<content><![CDATA[
+class Graph{
+public:
+  vector<vector<int>> adj;
+  vector<int> parent;
+  vector<int> depth;
+  vector<vector<int>> jump;
+  int LOG, N;
+  Graph(int n) {
+    LOG = 20, N = n;
+    adj = vector<vector<int>>(n+1);
+    depth = vector<int> (n+1);
+    parent = vector<int> (n+1);
+    jump = vector<vector<int>> (n+1, vector<int> (LOG, 0));
+  }
+  void takeInp() {
+  /////////////     TAKE INPUT      //////////////
+  	$0
+  }
+  void binaryLift() {
+  ////////////    DO SOME CHANGES IF WANT    ///////////
+    for(int i = 2; i <= N; i++) {
+      jump[i][0] = parent[i];
+    }
+
+    for(int l = 1; l < LOG; l++) {
+      for(int i = 2; i <= N; i++) {
+        jump[i][l] = jump[jump[i][l-1]][l-1];
+      }
+    }
+  }
+
+  void dfs(int l, int src = 1, int p = -1) {
+  ////////    CLACULATE DEPTH AND PARENT    ////////////
+    depth[src] = l;
+    parent[src] = p;
+    for(int u : adj[src]) {
+      if(u == p) continue;
+      dfs(l+1, u, src);
+    }
+  }
+  int findLca(int a, int b) {
+    // move both the nodes to the same depth
+    // by using depth array. 
+    if(depth[a] > depth[b]) swap(a, b);
+    int depthDiff = depth[b] - depth[a];
+    for(int i = 0; i < LOG; i++) {
+      if(depthDiff & (1 << i)) {
+        b = jump[b][i];
+      }
+    }
+
+    // cerr << depthDiff << " " << a << " " << b << '\n';
+    if(a == b) return a;
+    for(int l = LOG-1; l >= 0; l--) {
+      if(jump[a][l] != jump[b][l]) {
+        a = jump[a][l], b = jump[b][l];
+      }
+    }
+    return jump[a][0];
+  }
+};
+
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>LCA</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>
